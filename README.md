@@ -6,7 +6,9 @@
 [![JSDocs][jsdocs-src]][jsdocs-href]
 [![License][license-src]][license-href]
 
-Shiki transformer that highlights colors like HEX codes.
+Shiki transformer that highlights colors.
+
+Please check the docs: https://shiki-color-highlight.netlify.app/
 
 ## Sponsors
 

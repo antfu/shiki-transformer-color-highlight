@@ -19,13 +19,15 @@ A transformer for [Shiki](https://shiki.style) that highlights colors like HEX c
 }
 ```
 
-## Installation
+## Install
 
 ```sh
-npm install shiki-transformer-color-highlight
+npm i shiki-transformer-color-highlight
 ```
 
 ## Usage
+
+Usages for some popular frameworks:
 
 ### Shiki
 
@@ -48,3 +50,43 @@ const html = shiki.codeToHtml(code, {
   ],
 })
 ```
+
+### VitePress
+
+In VitePress, you can use the transformer in the configuration file:
+
+```ts [.vitepress/config.ts]
+import { transformerColorHighlight } from 'shiki-transformer-color-highlight'
+import { defineConfig } from 'vitepress'
+
+export default defineConfig({
+  markdown: {
+    codeTransformers: [
+      transformerColorHighlight(), // [!code hl]
+    ],
+  },
+})
+```
+
+### Nuxt Content
+
+In Nuxt Content, you can use the transformer by create a `mdc.config.ts` file as follows:
+
+```ts [mdc.config.ts]
+import { defineConfig } from '@nuxtjs/mdc/config'
+import { transformerColorHighlight } from 'shiki-transformer-color-highlight'
+
+export default defineConfig({
+  shiki: {
+    transformers: [
+      transformerColorHighlight(), // [!code hl]
+    ]
+  }
+})
+```
+
+## TODOs
+
+- [x] Detect hex codes
+- [ ] Detect `rgb()` and `rgba()` functions in CSS
+- [ ] Detect color names in CSS
