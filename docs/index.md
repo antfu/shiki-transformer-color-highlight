@@ -98,5 +98,6 @@ export default defineConfig({
 ## TODOs
 
 - [x] Detect hex codes
-- [ ] Detect `rgb()` and `rgba()` functions in CSS
+- [x] Detect `rgb()` and `rgba()` functions in CSS
+- [x] Detect `hsl()` and `hsla()` functions in CSS
 - [ ] Detect color names in CSS
