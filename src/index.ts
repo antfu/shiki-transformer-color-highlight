@@ -19,7 +19,25 @@ export interface TransformerColorHighlightOptions {
 
 export function defaultGetForegroundColor(color: string): string {
   const c = new Color(color)
-  return c.hsl[2] < 40 ? '#ffffff' : '#000000'
+
+  if (c.alpha <= 0.3) {
+    return 'inherit'
+  }
+
+  const [, s, l] = c.hsl
+
+  if (l > 70) {
+    return '#000000'
+  }
+  else if (l < 30) {
+    return '#ffffff'
+  }
+
+  if (s < 40) {
+    return l > 40 ? '#000000' : '#ffffff'
+  }
+
+  return '#ffffff'
 }
 
 export function transformerColorHighlight(
