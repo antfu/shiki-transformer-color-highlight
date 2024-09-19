@@ -6,9 +6,11 @@ export interface TransformerColorHighlightOptions {
   /**
    * Custom function to determine foreground color based on background color
    *
+   * Return `null` to skip highlighting
+   *
    * By default it uses `colorjs.io` to determine the luminance of the color
    */
-  getForegroundColor?: (color: string) => string
+  getForegroundColor?: (color: string) => string | null
   /**
    * Custom HTML style for highlighted color
    *
@@ -17,8 +19,16 @@ export interface TransformerColorHighlightOptions {
   htmlStyle?: string
 }
 
-export function defaultGetForegroundColor(color: string): string {
-  const c = new Color(color)
+export function defaultGetForegroundColor(color: string): string | null {
+  let c: Color
+
+  try {
+    c = new Color(color)
+  }
+  catch {
+    // Failed to parse
+    return null
+  }
 
   if (c.alpha <= 0.3) {
     return 'inherit'
@@ -26,7 +36,7 @@ export function defaultGetForegroundColor(color: string): string {
 
   const [, s, l] = c.hsl
 
-  if (l > 70) {
+  if (l > 60) {
     return '#000000'
   }
   else if (l < 30) {
@@ -56,8 +66,9 @@ export function transformerColorHighlight(
       const usages: ResolvedColorUsage[] = detectColorUsage(code, this.options.lang)
         .map(i => ({
           ...i,
-          foreground: getForegroundColor(i.color),
+          foreground: getForegroundColor(i.color)!,
         }))
+        .filter(i => i.foreground)
       map.set(this.meta, usages)
       return undefined
     },
@@ -138,9 +149,7 @@ interface ResolvedColorUsage extends ColorUsage {
 }
 
 const HEXRegex = /#[0-9a-f]{3,8}\b/gi
-const RGBARegex = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:(,\s*(0?\.?\d+|1(\.0+)?))\s*)?\)/gi
-// eslint-disable-next-line regexp/no-super-linear-backtracking, regexp/no-misleading-capturing-group
-const HSLARegex = /hsla?\(\s*(\d+)\s*(?:deg\s*)?,?\s*(\d+(?:\.\d+)?%)\s*(?:,\s*)?(\d+(?:\.\d+)?%)\s*(?:(?:,|\/)\s*)?(\d*(?:\.\d+)?)\s*\)/gi
+const RGBHSLRegex = /\b(?:rgb|hsl)a?\([\d\s\-,./%]+\)/gi
 
 export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
   const usages: ColorUsage[] = []
@@ -156,21 +165,13 @@ export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
     usages.push({ start, end, color })
   }
 
-  // rgb(a)
-  for (const match of code.matchAll(RGBARegex)) {
+  // rgb(a) / hsl(a)
+  for (const match of code.matchAll(RGBHSLRegex)) {
     const color = match[0]
 
     const start = match.index
     const end = start + color.length
-    usages.push({ start, end, color })
-  }
 
-  // hsl(a)
-  for (const match of code.matchAll(HSLARegex)) {
-    const color = match[0]
-
-    const start = match.index
-    const end = start + color.length
     usages.push({ start, end, color })
   }
 
