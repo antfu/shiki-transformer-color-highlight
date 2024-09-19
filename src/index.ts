@@ -119,15 +119,27 @@ interface ResolvedColorUsage extends ColorUsage {
   foreground: string
 }
 
+const HEXRegex = /#[0-9a-f]{3,8}\b/gi
+const RGBARegex = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:(,\s*(0?\.?\d+|1(\.0+)?))\s*)?\)/gi
+
 export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
   const usages: ColorUsage[] = []
 
-  for (const match of code.matchAll(/#[0-9a-f]{3,8}\b/gi)) {
+  for (const match of code.matchAll(HEXRegex)) {
     const color = match[0]
     // Skip invalid color
     if (![3, 4, 6, 8].includes(color.length - 1)) {
       continue
     }
+    const start = match.index
+    const end = start + color.length
+    usages.push({ start, end, color })
+  }
+
+  // rgb(a)
+  for (const match of code.matchAll(RGBARegex)) {
+    const color = match[0]
+
     const start = match.index
     const end = start + color.length
     usages.push({ start, end, color })

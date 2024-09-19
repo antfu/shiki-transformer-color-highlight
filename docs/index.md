@@ -16,6 +16,14 @@ A transformer for [Shiki](https://shiki.style) that highlights colors like HEX c
   --c-red-500: #ff0000;
   --c-red-600: #cc0000;
   --c-red-700: #990000;
+
+  --c-blue-1: rgb(204, 204, 255);
+  --c-blue-2: rgb(153, 153, 255);
+  --c-blue-3: rgb(102, 102, 255);
+  --c-blue-4: rgb(204, 51, 255);
+  --c-blue-5: rgba(0, 0, 255, 1);
+  --c-blue-6: rgba(0, 0, 255, .5);
+  --c-blue-7: rgba(0, 0, 255, 0);
 }
 ```
 
