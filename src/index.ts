@@ -121,6 +121,8 @@ interface ResolvedColorUsage extends ColorUsage {
 
 const HEXRegex = /#[0-9a-f]{3,8}\b/gi
 const RGBARegex = /rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*(?:(,\s*(0?\.?\d+|1(\.0+)?))\s*)?\)/gi
+// eslint-disable-next-line regexp/no-super-linear-backtracking, regexp/no-misleading-capturing-group
+const HSLARegex = /hsla?\(\s*(\d+)\s*(?:deg\s*)?,?\s*(\d+(?:\.\d+)?%)\s*(?:,\s*)?(\d+(?:\.\d+)?%)\s*(?:(?:,|\/)\s*)?(\d*(?:\.\d+)?)\s*\)/gi
 
 export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
   const usages: ColorUsage[] = []
@@ -138,6 +140,15 @@ export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
 
   // rgb(a)
   for (const match of code.matchAll(RGBARegex)) {
+    const color = match[0]
+
+    const start = match.index
+    const end = start + color.length
+    usages.push({ start, end, color })
+  }
+
+  // hsl(a)
+  for (const match of code.matchAll(HSLARegex)) {
     const color = match[0]
 
     const start = match.index

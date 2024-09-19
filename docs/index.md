@@ -24,6 +24,8 @@ A transformer for [Shiki](https://shiki.style) that highlights colors like HEX c
   --c-blue-5: rgba(0, 0, 255, 1);
   --c-blue-6: rgba(0, 0, 255, .5);
   --c-blue-7: rgba(0, 0, 255, 0);
+  --c-blue-8: hsl(210, 80%, 100%);
+  --c-blue-9: hsl(240, 80%, 100%);
 }
 ```
 
