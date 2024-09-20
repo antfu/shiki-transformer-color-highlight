@@ -149,7 +149,13 @@ interface ResolvedColorUsage extends ColorUsage {
   foreground: string
 }
 
-export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
+const enableDetectColorLangs = ['css', 'scss', 'less', 'html', 'vue', 'svelte', 'md']
+
+export function detectColorUsage(code: string, lang: string): ColorUsage[] {
+  if (!enableDetectColorLangs.includes(lang.toLowerCase())) {
+    return []
+  }
+
   const usages: ColorUsage[] = []
 
   for (const match of code.matchAll(HEXRegex)) {
