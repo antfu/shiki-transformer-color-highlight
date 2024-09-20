@@ -97,4 +97,4 @@ export default defineConfig({
 - [x] Detect hex codes
 - [x] Detect `rgb()` and `rgba()` functions in CSS
 - [x] Detect `hsl()` and `hsla()` functions in CSS
-- [ ] Detect color names in CSS
+- [x] Detect color names in CSS
