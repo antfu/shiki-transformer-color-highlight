@@ -1,7 +1,7 @@
 import type { ShikiTransformer, ThemedToken } from '@shikijs/types'
 import { splitToken } from '@shikijs/core'
 import Color from 'colorjs.io'
-import { getNamedColorsRegex, HEXRegex, RGBHSLRegex } from './utils/color-regex'
+import { HEXRegex, namedColorsRegex, RGBHSLRegex } from './utils/color-regex'
 
 export interface TransformerColorHighlightOptions {
   /**
@@ -179,9 +179,7 @@ export function detectColorUsage(code: string, lang: string): ColorUsage[] {
     usages.push({ start, end, color })
   }
 
-  const namedRegex = getNamedColorsRegex()
-
-  for (const match of code.matchAll(namedRegex)) {
+  for (const match of code.matchAll(namedColorsRegex)) {
     const color = match[0]
 
     const start = match.index

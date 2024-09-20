@@ -164,4 +164,4 @@ export const NAMED_COLORS = [
   'whitesmoke',
   'yellow',
   'yellowgreen',
-]
+].join('|')
