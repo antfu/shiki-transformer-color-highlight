@@ -16,7 +16,7 @@ export interface TransformerColorHighlightOptions {
    *
    * Default: `display:inline-block;padding:0 0.15em;margin:0 -0.15em;border-radius:0.2em;`
    */
-  htmlStyle?: string
+  htmlStyle?: Record<string, string>
 }
 
 export function defaultGetForegroundColor(color: string): string | null {
@@ -55,7 +55,12 @@ export function transformerColorHighlight(
 ): ShikiTransformer {
   const {
     getForegroundColor = defaultGetForegroundColor,
-    htmlStyle = 'display:inline-block;padding:0 0.15em;margin:0 -0.15em;border-radius:0.2em;',
+    htmlStyle = {
+      'display': 'inline-block',
+      'padding': '0 0.15em',
+      'margin': '0 -0.15em',
+      'border-radius': '0.2em',
+    },
   } = options
 
   const map = new WeakMap<any, ResolvedColorUsage[]>()
@@ -111,7 +116,11 @@ export function transformerColorHighlight(
               content: buffer.map(i => i.content).join(''),
               bgColor: current.color,
               color: current.foreground,
-              htmlStyle: `background-color:${current.color};color:${current.foreground};${htmlStyle}`,
+              htmlStyle: {
+                'background-color': current.color,
+                'color': current.foreground,
+                ...htmlStyle,
+              },
             }
             tokens.push(token)
             buffer.length = 0
