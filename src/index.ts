@@ -149,45 +149,53 @@ interface ResolvedColorUsage extends ColorUsage {
   foreground: string
 }
 
+type RegexMatchResult = IterableIterator<RegExpExecArray>
+type ColorValidator = (color: string) => boolean
+
 const enableDetectNamedColorLangs = ['css', 'less', 'scss', 'sass', 'stylus']
 
-export function detectColorUsage(code: string, lang: string): ColorUsage[] {
-  const usages: ColorUsage[] = []
+function collectionColors(matchResults: RegexMatchResult, validator?: ColorValidator): ColorUsage[] {
+  const collection: ColorUsage[] = []
 
-  for (const match of code.matchAll(HEXRegex)) {
+  for (const match of matchResults) {
     const color = match[0]
-    // Skip invalid color
-    if (![3, 4, 6, 8].includes(color.length - 1)) {
-      continue
-    }
-    const start = match.index
-    const end = start + color.length
-    usages.push({ start, end, color })
-  }
+    const isValid = typeof validator === 'function' ? validator(color) : true
 
-  // rgb(a) / hsl(a)
-  for (const match of code.matchAll(RGBHSLRegex)) {
-    const color = match[0]
-
-    const start = match.index
-    const end = start + color.length
-
-    usages.push({ start, end, color })
-  }
-
-  if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
-    for (const match of code.matchAll(namedColorsRegex)) {
-      const color = match[0]
-
+    if (isValid) {
       const start = match.index
       const end = start + color.length
-
-      usages.push({ start, end, color })
+      collection.push({ start, end, color })
     }
+  }
+
+  return collection
+}
+
+export function detectColorUsage(code: string, lang: string): ColorUsage[] {
+  const usages: ColorUsage[][] = []
+
+  // hex color
+  usages.push(
+    collectionColors(
+      code.matchAll(HEXRegex),
+      color => [3, 4, 6, 8].includes(color.length - 1),
+    ),
+  )
+
+  // rgb(a) / hsl(a)
+  usages.push(
+    collectionColors(code.matchAll(RGBHSLRegex)),
+  )
+
+  if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
+    // named color
+    usages.push(
+      collectionColors(code.matchAll(namedColorsRegex)),
+    )
   }
 
   // TODO: Add more color formats
 
-  return usages
+  return usages.flat(1)
     .sort((a, b) => a.start - b.start)
 }
