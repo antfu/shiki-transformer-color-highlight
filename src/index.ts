@@ -1,6 +1,7 @@
 import type { ShikiTransformer, ThemedToken } from '@shikijs/types'
 import { splitToken } from '@shikijs/core'
 import Color from 'colorjs.io'
+import { HEXRegex, namedColorsRegex, RGBHSLRegex } from './utils/color-regex'
 
 export interface TransformerColorHighlightOptions {
   /**
@@ -157,35 +158,53 @@ interface ResolvedColorUsage extends ColorUsage {
   foreground: string
 }
 
-const HEXRegex = /#[0-9a-f]{3,8}\b/gi
-const RGBHSLRegex = /\b(?:rgb|hsl)a?\([\d\s\-,./%]+\)/gi
+type RegexMatchResult = IterableIterator<RegExpExecArray>
+type ColorValidator = (color: string) => boolean
 
-export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
-  const usages: ColorUsage[] = []
+const enableDetectNamedColorLangs = ['css', 'less', 'scss', 'sass', 'stylus']
 
-  for (const match of code.matchAll(HEXRegex)) {
+function collectionColors(matchResults: RegexMatchResult, validator?: ColorValidator): ColorUsage[] {
+  const collection: ColorUsage[] = []
+
+  for (const match of matchResults) {
     const color = match[0]
-    // Skip invalid color
-    if (![3, 4, 6, 8].includes(color.length - 1)) {
-      continue
+    const isValid = typeof validator === 'function' ? validator(color) : true
+
+    if (isValid) {
+      const start = match.index
+      const end = start + color.length
+      collection.push({ start, end, color })
     }
-    const start = match.index
-    const end = start + color.length
-    usages.push({ start, end, color })
   }
 
+  return collection
+}
+
+export function detectColorUsage(code: string, lang: string): ColorUsage[] {
+  const usages: ColorUsage[][] = []
+
+  // hex color
+  usages.push(
+    collectionColors(
+      code.matchAll(HEXRegex),
+      color => [3, 4, 6, 8].includes(color.length - 1),
+    ),
+  )
+
   // rgb(a) / hsl(a)
-  for (const match of code.matchAll(RGBHSLRegex)) {
-    const color = match[0]
+  usages.push(
+    collectionColors(code.matchAll(RGBHSLRegex)),
+  )
 
-    const start = match.index
-    const end = start + color.length
-
-    usages.push({ start, end, color })
+  if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
+    // named color
+    usages.push(
+      collectionColors(code.matchAll(namedColorsRegex)),
+    )
   }
 
   // TODO: Add more color formats
 
-  return usages
+  return usages.flat(1)
     .sort((a, b) => a.start - b.start)
 }
