@@ -149,13 +149,9 @@ interface ResolvedColorUsage extends ColorUsage {
   foreground: string
 }
 
-const enableDetectColorLangs = ['css', 'less', 'scss', 'sass', 'stylus']
+const enableDetectNamedColorLangs = ['css', 'less', 'scss', 'sass', 'stylus']
 
 export function detectColorUsage(code: string, lang: string): ColorUsage[] {
-  if (!enableDetectColorLangs.includes(lang.toLowerCase())) {
-    return []
-  }
-
   const usages: ColorUsage[] = []
 
   for (const match of code.matchAll(HEXRegex)) {
@@ -179,13 +175,15 @@ export function detectColorUsage(code: string, lang: string): ColorUsage[] {
     usages.push({ start, end, color })
   }
 
-  for (const match of code.matchAll(namedColorsRegex)) {
-    const color = match[0]
+  if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
+    for (const match of code.matchAll(namedColorsRegex)) {
+      const color = match[0]
 
-    const start = match.index
-    const end = start + color.length
+      const start = match.index
+      const end = start + color.length
 
-    usages.push({ start, end, color })
+      usages.push({ start, end, color })
+    }
   }
 
   // TODO: Add more color formats
