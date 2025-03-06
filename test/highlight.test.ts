@@ -58,5 +58,5 @@ it('case1', async () => {
     ],
   })
 
-  expect(result).toMatchFileSnapshot('./output/case1.html')
+  await expect(result).toMatchFileSnapshot('./output/case1.html')
 })
