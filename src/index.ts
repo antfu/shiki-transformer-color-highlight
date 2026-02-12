@@ -158,7 +158,7 @@ interface ResolvedColorUsage extends ColorUsage {
 }
 
 const HEXRegex = /#[0-9a-f]{3,8}\b/gi
-const RGBHSLRegex = /\b(?:rgb|hsl)a?\([\d\s\-,./%]+\)/gi
+const RGBHSLRegex = /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\([\d\s\-,./%]+\)/gi
 
 export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
   const usages: ColorUsage[] = []
@@ -174,7 +174,7 @@ export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
     usages.push({ start, end, color })
   }
 
-  // rgb(a) / hsl(a)
+  // rgb(a) / hsl(a) / hwb / lab / lch / oklab / oklch
   for (const match of code.matchAll(RGBHSLRegex)) {
     const color = match[0]
 
