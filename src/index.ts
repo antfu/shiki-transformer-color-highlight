@@ -37,6 +37,10 @@ export function defaultGetForegroundColor(color: string): string | null {
 
   const [, s, l] = c.hsl
 
+  if (l === null || s === null) {
+    return null
+  }
+
   if (l > 60) {
     return '#000000'
   }
@@ -181,30 +185,36 @@ function collectionColors(matchResults: RegexMatchResult, validator?: ColorValid
 }
 
 export function detectColorUsage(code: string, lang: string): ColorUsage[] {
-  const usages: ColorUsage[][] = []
+  const usages: ColorUsage[] = []
 
-  // hex color
-  usages.push(
-    collectionColors(
-      code.matchAll(HEXRegex),
-      color => [3, 4, 6, 8].includes(color.length - 1),
-    ),
-  )
+  for (const match of code.matchAll(HEXRegex)) {
+    const color = match[0]
+    // Skip invalid color
+    if (![3, 4, 6, 8].includes(color.length - 1)) {
+      continue
+    }
+    const start = match.index
+    const end = start + color.length
+    usages.push({ start, end, color })
+  }
 
-  // rgb(a) / hsl(a)
-  usages.push(
-    collectionColors(code.matchAll(RGBHSLRegex)),
-  )
+  // rgb(a) / hsl(a) / hwb / lab / lch / oklab / oklch
+  for (const match of code.matchAll(RGBHSLRegex)) {
+    const color = match[0]
+
+    const start = match.index
+    const end = start + color.length
+
+    usages.push({ start, end, color })
+  }
 
   // named color
   if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
     usages.push(
-      collectionColors(code.matchAll(namedColorsRegex)),
+      ...collectionColors(code.matchAll(namedColorsRegex)),
     )
   }
 
-  // TODO: Add more color formats
-
-  return usages.flat(1)
+  return usages
     .sort((a, b) => a.start - b.start)
 }
