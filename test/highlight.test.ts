@@ -43,6 +43,11 @@ it('case1', async () => {
       --c-blue-7: rgba(0, 0, 255, 0);
       --c-blue-8: hsl(210, 80%, 100%);
       --c-blue-9: hsl(240, 80%, 100%);
+      --c-blue-10: hwb(240 0% 0%);
+      --c-blue-11: lab(29.2345% 39.3825 20.0664);
+      --c-blue-12: lch(29.2345% 44.2 27);
+      --c-blue-13: oklab(40.1% 0.1143 0.045);
+      --c-blue-14: oklch(40.1% 0.123 21.57);
 
       --invalid-1: rgb(1);
       --invalid-2: hsl(1243, 140%, 150%);
@@ -58,5 +63,5 @@ it('case1', async () => {
     ],
   })
 
-  expect(result).toMatchFileSnapshot('./output/case1.html')
+  await expect(result).toMatchFileSnapshot('./output/case1.html')
 })

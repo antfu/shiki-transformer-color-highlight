@@ -1,5 +1,13 @@
+shellEmulator: true
+
+trustPolicy: no-downgrade
+
 packages:
   - playground
   - docs
   - packages/*
   - examples/*
+
+onlyBuiltDependencies:
+  - esbuild
+  - simple-git-hooks
