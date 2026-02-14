@@ -171,3 +171,102 @@ it('detect', () => {
     ]
   `)
 })
+
+it('detect named colors in CSS', () => {
+  expect(
+    detectColorUsage(
+      `
+      .foo {
+        color: red;
+        background: white;
+        border-color: blue;
+      }
+
+      .bar {
+        color: lightblue;
+        background-color: darkgreen;
+        border: 1px solid black;
+      }
+      `,
+      'css',
+    ),
+  ).toMatchInlineSnapshot(`
+    [
+      {
+        "color": "red",
+        "end": 32,
+        "start": 29,
+      },
+      {
+        "color": "white",
+        "end": 59,
+        "start": 54,
+      },
+      {
+        "color": "blue",
+        "end": 87,
+        "start": 83,
+      },
+      {
+        "color": "lightblue",
+        "end": 135,
+        "start": 126,
+      },
+      {
+        "color": "darkgreen",
+        "end": 172,
+        "start": 163,
+      },
+      {
+        "color": "black",
+        "end": 205,
+        "start": 200,
+      },
+    ]
+  `)
+})
+
+it('should not detect named colors in non-CSS languages', () => {
+  expect(
+    detectColorUsage(
+      `
+      const color = 'red';
+      const bg = 'blue';
+      `,
+      'javascript',
+    ),
+  ).toEqual([])
+})
+
+it('should not detect named colors in CSS variable names', () => {
+  expect(
+    detectColorUsage(
+      `
+      :root {
+        --c-blue-1: #123456;
+        --color-red-500: #ff0000;
+        --bg-white: #ffffff;
+      }
+      `,
+      'css',
+    ),
+  ).toMatchInlineSnapshot(`
+    [
+      {
+        "color": "#123456",
+        "end": 42,
+        "start": 35,
+      },
+      {
+        "color": "#ff0000",
+        "end": 76,
+        "start": 69,
+      },
+      {
+        "color": "#ffffff",
+        "end": 105,
+        "start": 98,
+      },
+    ]
+  `)
+})

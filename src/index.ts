@@ -196,8 +196,8 @@ export function detectColorUsage(code: string, lang: string): ColorUsage[] {
     collectionColors(code.matchAll(RGBHSLRegex)),
   )
 
+  // named color
   if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
-    // named color
     usages.push(
       collectionColors(code.matchAll(namedColorsRegex)),
     )
