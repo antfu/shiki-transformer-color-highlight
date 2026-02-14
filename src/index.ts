@@ -1,6 +1,7 @@
 import type { ShikiTransformer, ThemedToken } from '@shikijs/types'
 import { splitToken } from '@shikijs/core'
 import Color from 'colorjs.io'
+import { HEXRegex, namedColorsRegex, RGBHSLRegex } from './utils/color-regex'
 
 export interface TransformerColorHighlightOptions {
   /**
@@ -35,6 +36,10 @@ export function defaultGetForegroundColor(color: string): string | null {
   }
 
   const [, s, l] = c.hsl
+
+  if (l === null || s === null) {
+    return null
+  }
 
   if (l > 60) {
     return '#000000'
@@ -157,10 +162,29 @@ interface ResolvedColorUsage extends ColorUsage {
   foreground: string
 }
 
-const HEXRegex = /#[0-9a-f]{3,8}\b/gi
-const RGBHSLRegex = /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\([\d\s\-,./%]+\)/gi
+type RegexMatchResult = IterableIterator<RegExpExecArray>
+type ColorValidator = (color: string) => boolean
 
-export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
+const enableDetectNamedColorLangs = ['css', 'less', 'scss', 'sass', 'stylus']
+
+function collectionColors(matchResults: RegexMatchResult, validator?: ColorValidator): ColorUsage[] {
+  const collection: ColorUsage[] = []
+
+  for (const match of matchResults) {
+    const color = match[0]
+    const isValid = typeof validator === 'function' ? validator(color) : true
+
+    if (isValid) {
+      const start = match.index
+      const end = start + color.length
+      collection.push({ start, end, color })
+    }
+  }
+
+  return collection
+}
+
+export function detectColorUsage(code: string, lang: string): ColorUsage[] {
   const usages: ColorUsage[] = []
 
   for (const match of code.matchAll(HEXRegex)) {
@@ -184,7 +208,12 @@ export function detectColorUsage(code: string, _lang: string): ColorUsage[] {
     usages.push({ start, end, color })
   }
 
-  // TODO: Add more color formats
+  // named color
+  if (enableDetectNamedColorLangs.includes(lang.toLowerCase())) {
+    usages.push(
+      ...collectionColors(code.matchAll(namedColorsRegex)),
+    )
+  }
 
   return usages
     .sort((a, b) => a.start - b.start)

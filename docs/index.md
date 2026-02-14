@@ -17,15 +17,12 @@ A transformer for [Shiki](https://shiki.style) that highlights colors like HEX c
   --c-red-600: #cc0000;
   --c-red-700: #990000;
 
-  --c-blue-1: rgb(204, 204, 255);
-  --c-blue-2: rgb(153, 153, 255);
-  --c-blue-3: rgb(102, 102, 255);
-  --c-blue-4: rgb(204, 51, 255);
-  --c-blue-5: rgba(0, 0, 255, 1);
-  --c-blue-6: rgba(0, 0, 255, .5);
-  --c-blue-7: rgba(0, 0, 255, 0);
-  --c-blue-8: hsl(210, 80%, 100%);
-  --c-blue-9: hsl(240, 80%, 100%);
+  --c-rgb: rgb(204, 204, 255);
+  --c-rgba: rgb(204, 204, 255, .5);
+  --c-hsl: hsl(210, 80%, 60%);
+  --c-hsla: hsl(240, 80%, 60%, .3);
+  --c-named-black: black;
+  --c-named-orange: orange;
 }
 ```
 
@@ -100,4 +97,4 @@ export default defineConfig({
 - [x] Detect hex codes
 - [x] Detect `rgb()` and `rgba()` functions in CSS
 - [x] Detect `hsl()` and `hsla()` functions in CSS
-- [ ] Detect color names in CSS
+- [x] Detect color names in CSS
