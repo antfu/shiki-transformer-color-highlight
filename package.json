@@ -42,8 +42,8 @@
     "docs:preview": "vitepress preview docs"
   },
   "dependencies": {
-    "@shikijs/core": "^3.22.0",
-    "@shikijs/types": "^3.22.0",
+    "@shikijs/core": "^4.3.1",
+    "@shikijs/types": "^4.3.1",
     "colorjs.io": "^0.6.1"
   },
   "devDependencies": {
@@ -55,7 +55,7 @@
     "eslint": "^10.0.0",
     "lint-staged": "^16.2.7",
     "pnpm": "^10.29.3",
-    "shiki": "^3.22.0",
+    "shiki": "^4.3.1",
     "simple-git-hooks": "^2.13.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
